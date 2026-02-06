@@ -24,6 +24,12 @@ from scripts.lottery_analyzer import DoubleColorBallAnalyzer
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
 
+@app.context_processor
+def inject_current_year():
+    """让所有模板可直接使用 current_year，避免模板里使用未传入的 datetime 报错。"""
+    return {"current_year": datetime.now(timezone.utc).year}
+
+
 def get_analyzer() -> DoubleColorBallAnalyzer:
     """获取全局双色球分析器实例，并确保历史数据已初始化更新。"""
     # 简单的惰性初始化，全局只创建一个实例

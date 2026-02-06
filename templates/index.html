@@ -207,7 +207,7 @@
       </main>
 
       <footer class="footer">
-        <span>© {{ datetime.utcnow().year }} 双色球智能推荐助手</span>
+        <span>© {{ current_year }} 双色球智能推荐助手</span>
         <span>仅供学习与研究使用</span>
       </footer>
     </div>
@@ -369,7 +369,11 @@
             },
             body: JSON.stringify({ red_dan, blue_dan, strategies }),
           });
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.plan) {
+            alert("生成方案失败，请稍后重试。");
+            return;
+          }
           renderPlan(data.plan);
         } catch (err) {
           console.error(err);

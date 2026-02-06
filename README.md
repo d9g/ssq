@@ -1,20 +1,20 @@
 # 🎯 双色球开奖数据分析系统
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## ⚠️ 重要免责声明
 
 **本项目仅用于技术学习和数据分析研究目的**
 
-- 🎲 彩票开奖结果完全随机，历史数据无法预测未来结果
+- 🎲 彩票开奖结果完全随机
 - 📊 本分析结果仅供参考，不构成任何投注建议
 - 💰 请理性购彩，量力而行，未满18周岁禁止购买彩票
 - ⚖️ 开发者不承担因使用本脚本产生的任何损失
 
 ## 🎯 今日推荐号码
 
-**⚠️ 以下推荐号码基于历史统计分析，仅供参考，不保证中奖！**
+**⚠️ 以下推荐号码基于历史统计分析，仅供参考！**
 
 ### 双色球推荐 (更新时间: 2026年02月05日 21:30:00)
 
@@ -78,6 +78,18 @@ cd ssq
    ```bash
    python lottery_analyzer.py
    ```
+
+### 服务器部署（阿里云 Linux 3 + 宝塔）
+
+在 **Alibaba Cloud Linux 3** 且已安装 **宝塔面板** 的服务器上，可一键完成应用部署，再在宝塔中配置反向代理即可：
+
+```bash
+git clone https://github.com/d9g/ssq.git
+cd ssq
+bash deploy_aliyun.sh
+```
+
+详细步骤（systemd、宝塔反向代理、定时任务）见 [DEPLOY.md](DEPLOY.md) 中的 **「Alibaba Cloud Linux 3 + 宝塔面板」** 章节。
 
 ### GitHub Actions自动化
 
