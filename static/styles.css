@@ -268,14 +268,16 @@ body {
 .ticket-body {
   font-size: 0.86rem;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .ticket-red,
 .ticket-blue {
-  display: flex;
-  align-items: baseline;
+  display: inline-flex;
+  align-items: center;
   gap: 4px;
 }
 
@@ -286,12 +288,7 @@ body {
   min-width: 34px;
 }
 
-.ticket-red .balls {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
+.ticket-red .balls,
 .ticket-blue .balls {
   display: inline-flex;
   flex-wrap: wrap;
@@ -382,6 +379,18 @@ body {
 
 .table-history td {
   color: #d1d5db;
+}
+
+/* 最近 10 期表格隐藏期号列，仅保留日期+红球+蓝球 */
+.table-history-recent .ball {
+  width: 22px;
+  height: 22px;
+  font-size: 0.72rem;
+}
+
+.table-history-recent td:first-child {
+  color: #9ca3af;
+  white-space: nowrap;
 }
 
 .footer {

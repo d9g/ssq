@@ -6,15 +6,15 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1"
     />
-    <title>双色球智能推荐助手</title>
+    <title>邪修双色球</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
     <div class="page">
       <header class="header">
-        <div class="header-title">双色球智能推荐助手</div>
+        <div class="header-title">邪修双色球</div>
         <div class="header-subtitle">
-          基于历史统计 + 组合优化的结构化选号工具（仅供学习与参考）
+          （仅供学习与参考）
         </div>
         <div class="header-meta">
           <span>最新期号：<strong>{{ latest_period }}</strong></span>
@@ -25,9 +25,6 @@
       <main class="main">
         <section class="card">
           <h2 class="card-title">参数设置</h2>
-          <p class="card-desc">
-            可选输入红胆 / 蓝胆作为参考约束。如果不输入，则视为无拖胆，由系统完全自动生成。
-          </p>
 
           <form id="form-recommend" class="form">
             <div class="form-row">
@@ -43,7 +40,7 @@
             </div>
 
             <div class="form-row">
-              <label for="blue_dan" class="form-label">蓝胆（1-16，逗号分隔）</label>
+              <label for="blue_dan" class="form-label">蓝胆（1-16）</label>
               <input
                 id="blue_dan"
                 name="blue_dan"
@@ -140,18 +137,12 @@
             </div>
 
             <p class="tip-text">
-              提示：本工具只做<b>结构化选号与可视化</b>，不承诺提高中奖概率。彩票具有随机性，请量力而行。
+              提示：本工具只做<b>结构化选号与可视化</b>，不做任何承诺。彩票具有随机性，请量力而行。
             </p>
           </form>
         </section>
 
         <section class="card">
-          <h2 class="card-title">推荐方案</h2>
-          <p class="card-desc">
-            固定生成 <strong>8 注 6+1 单式</strong> + <strong>1 注 7+1 复式</strong> +
-            <strong>1 注 6+2 复式</strong>，在固定预算下尽量分散号码，提升中小奖体验的稳定性。
-          </p>
-
           <div id="result-container">
             {% if enhanced_plan %}
             <script>
@@ -164,13 +155,12 @@
         <section class="card">
           <h2 class="card-title">最近 10 期开奖号码</h2>
           <p class="card-desc">
-            方便对照最新走势。以下数据来自当前本地历史数据文件，并不保证实时同步官网。
+            以下数据来自本地历史数据文件，不保证实时同步官网。
           </p>
           <div class="table-wrapper">
-            <table class="table-history">
+            <table class="table-history table-history-recent">
               <thead>
                 <tr>
-                  <th>期号</th>
                   <th>开奖日期</th>
                   <th>红球</th>
                   <th>蓝球</th>
@@ -179,7 +169,6 @@
               <tbody>
                 {% for rec in recent_draws %}
                 <tr>
-                  <td>{{ rec.period }}</td>
                   <td>{{ rec.date }}</td>
                   <td>
                     {% for n in rec.red_balls %}
@@ -199,15 +188,14 @@
         <section class="card card-warning">
           <h2 class="card-title">免责声明</h2>
           <ul class="warning-list">
-            <li>本页面仅用于技术学习与数据分析演示，不构成任何投注建议。</li>
-            <li>彩票开奖结果完全随机，任何历史数据与模型都无法预测未来。</li>
+            <li>本页仅用于学习与数据分析演示，不构成任何投注建议。</li>
             <li>请理性购彩，量力而行，未满 18 周岁禁止购买彩票。</li>
           </ul>
         </section>
       </main>
 
       <footer class="footer">
-        <span>© {{ current_year }} 双色球智能推荐助手</span>
+        <span>© {{ current_year }} 邪修双色球助手</span>
         <span>仅供学习与研究使用</span>
       </footer>
     </div>
@@ -238,7 +226,7 @@
 
         // 8 注 6+1 单式
         html += '<div class="result-block">';
-        html += '<div class="result-block-title">8 注 6+1 单式（智能策略）</div>';
+        html += '<div class="result-block-title"> 6+1 单式（智能策略）</div>';
         html += '<div class="ticket-list">';
         singles.forEach((t, idx) => {
           html += `
@@ -249,14 +237,12 @@
               </div>
               <div class="ticket-body">
                 <div class="ticket-red">
-                  <span class="label">红球</span>
                   <span class="balls">${renderBalls(
                     t.red_balls,
                     "red"
                   )}</span>
                 </div>
                 <div class="ticket-blue">
-                  <span class="label">蓝球</span>
                   <span class="balls">${renderBalls(
                     t.blue_balls,
                     "blue"
@@ -281,14 +267,12 @@
               </div>
               <div class="ticket-body">
                 <div class="ticket-red">
-                  <span class="label">红球</span>
                   <span class="balls">${renderBalls(
                     combo7.red_balls,
                     "red"
                   )}</span>
                 </div>
                 <div class="ticket-blue">
-                  <span class="label">蓝球</span>
                   <span class="balls">${renderBalls(
                     combo7.blue_balls,
                     "blue"
@@ -313,14 +297,12 @@
               </div>
               <div class="ticket-body">
                 <div class="ticket-red">
-                  <span class="label">红球</span>
                   <span class="balls">${renderBalls(
                     combo62.red_balls,
                     "red"
                   )}</span>
                 </div>
                 <div class="ticket-blue">
-                  <span class="label">蓝球</span>
                   <span class="balls">${renderBalls(
                     combo62.blue_balls,
                     "blue"

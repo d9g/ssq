@@ -122,6 +122,12 @@ def api_recommend():
     red_dan = parse_dan_input(red_dan_raw, max_num=33)
     blue_dan = parse_dan_input(blue_dan_raw, max_num=16)
 
+    # 非法约束：红胆最多 5 个（6+1 需 6 红），蓝胆最多 1 个；超出则按未上送处理
+    if len(red_dan) > 5:
+        red_dan = []
+    if len(blue_dan) > 1:
+        blue_dan = []
+
     # 先生成8种策略推荐，再带入增强方案（支持拖胆约束）
     recommendations = analyzer.generate_recommendations(num_sets=8)
     # 如果前端指定了策略过滤，则按策略名称过滤单式组合
