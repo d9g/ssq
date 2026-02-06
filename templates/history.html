@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <title>双色球历史开奖数据</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="header-title">双色球历史开奖数据</div>
+        <div class="header-subtitle">
+          本页展示当前本地保存的历史开奖记录（分页查看），用于数据分析与对照。
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="card">
+          <h2 class="card-title">开奖列表（第 {{ page }} / {{ pages }} 页）</h2>
+          <p class="card-desc">
+            共 {{ total }} 期数据。点击底部分页按钮可切换页面。数据来源于本地
+            <code>lottery_data.json</code> 文件。
+          </p>
+
+          <div class="table-wrapper">
+            <table class="table-history">
+              <thead>
+                <tr>
+                  <th>期号</th>
+                  <th>开奖日期</th>
+                  <th>红球</th>
+                  <th>蓝球</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rec in records %}
+                <tr>
+                  <td>{{ rec.period }}</td>
+                  <td>{{ rec.date }}</td>
+                  <td>
+                    {% for n in rec.red_balls %}
+                    <span class="ball ball-red">{{ "%02d"|format(n) }}</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <span class="ball ball-blue">{{ "%02d"|format(rec.blue_ball) }}</span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            {% if page > 1 %}
+            <a class="page-btn" href="{{ url_for('history', page=page-1) }}">上一页</a>
+            {% else %}
+            <span class="page-btn disabled">上一页</span>
+            {% endif %}
+
+            <span class="page-info">第 {{ page }} / {{ pages }} 页</span>
+
+            {% if page < pages %}
+            <a class="page-btn" href="{{ url_for('history', page=page+1) }}">下一页</a>
+            {% else %}
+            <span class="page-btn disabled">下一页</span>
+            {% endif %}
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">原始 JSON 片段（本页）</h2>
+          <p class="card-desc">
+            仅展示当前页的 JSON 片段，便于开发调试和数据检查。
+          </p>
+          <div class="table-wrapper">
+            <pre
+              style="font-size: 0.75rem; white-space: pre; color: #e5e7eb; background: #020617; padding: 8px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.5);"
+            >{{ records|tojson(indent=2, ensure_ascii=False) }}</pre>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>返回首页：<a href="{{ url_for('index') }}" style="color:#38bdf8;">智能推荐助手</a></span>
+        <span>仅供学习和数据分析使用</span>
+      </footer>
+    </div>
+  </body>
+</html>
+

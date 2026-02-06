@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <title>双色球智能推荐助手</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="header-title">双色球智能推荐助手</div>
+        <div class="header-subtitle">
+          基于历史统计 + 组合优化的结构化选号工具（仅供学习与参考）
+        </div>
+        <div class="header-meta">
+          <span>最新期号：<strong>{{ latest_period }}</strong></span>
+          <span>开奖日期：<strong>{{ latest_date }}</strong></span>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="card">
+          <h2 class="card-title">参数设置</h2>
+          <p class="card-desc">
+            可选输入红胆 / 蓝胆作为参考约束。如果不输入，则视为无拖胆，由系统完全自动生成。
+          </p>
+
+          <form id="form-recommend" class="form">
+            <div class="form-row">
+              <label for="red_dan" class="form-label">红胆（1-33，逗号分隔）</label>
+              <input
+                id="red_dan"
+                name="red_dan"
+                type="text"
+                inputmode="numeric"
+                placeholder="例如：3, 9, 16（可留空）"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="blue_dan" class="form-label">蓝胆（1-16，逗号分隔）</label>
+              <input
+                id="blue_dan"
+                name="blue_dan"
+                type="text"
+                inputmode="numeric"
+                placeholder="例如：8（可留空）"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">推荐策略（可多选）</div>
+              <div class="strategy-grid">
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="高频主导"
+                    checked
+                  />
+                  <span>高频主导</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="均衡分布"
+                    checked
+                  />
+                  <span>均衡分布</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="中频优先"
+                    checked
+                  />
+                  <span>中频优先</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="冷热结合"
+                    checked
+                  />
+                  <span>冷热结合</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="超高频"
+                    checked
+                  />
+                  <span>超高频</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="低频反选"
+                    checked
+                  />
+                  <span>低频反选</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="随机均衡"
+                    checked
+                  />
+                  <span>随机均衡</span>
+                </label>
+                <label class="strategy-item">
+                  <input
+                    type="checkbox"
+                    name="strategy"
+                    value="奇偶优化"
+                    checked
+                  />
+                  <span>奇偶优化</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">生成推荐方案</button>
+              <button type="button" id="btn-clear" class="btn-secondary">
+                清空参数
+              </button>
+            </div>
+
+            <p class="tip-text">
+              提示：本工具只做<b>结构化选号与可视化</b>，不承诺提高中奖概率。彩票具有随机性，请量力而行。
+            </p>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">推荐方案</h2>
+          <p class="card-desc">
+            固定生成 <strong>8 注 6+1 单式</strong> + <strong>1 注 7+1 复式</strong> +
+            <strong>1 注 6+2 复式</strong>，在固定预算下尽量分散号码，提升中小奖体验的稳定性。
+          </p>
+
+          <div id="result-container">
+            {% if enhanced_plan %}
+            <script>
+              window.__INITIAL_PLAN__ = {{ enhanced_plan|tojson|safe }};
+            </script>
+            {% endif %}
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">最近 10 期开奖号码</h2>
+          <p class="card-desc">
+            方便对照最新走势。以下数据来自当前本地历史数据文件，并不保证实时同步官网。
+          </p>
+          <div class="table-wrapper">
+            <table class="table-history">
+              <thead>
+                <tr>
+                  <th>期号</th>
+                  <th>开奖日期</th>
+                  <th>红球</th>
+                  <th>蓝球</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rec in recent_draws %}
+                <tr>
+                  <td>{{ rec.period }}</td>
+                  <td>{{ rec.date }}</td>
+                  <td>
+                    {% for n in rec.red_balls %}
+                    <span class="ball ball-red">{{ "%02d"|format(n) }}</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <span class="ball ball-blue">{{ "%02d"|format(rec.blue_ball) }}</span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card card-warning">
+          <h2 class="card-title">免责声明</h2>
+          <ul class="warning-list">
+            <li>本页面仅用于技术学习与数据分析演示，不构成任何投注建议。</li>
+            <li>彩票开奖结果完全随机，任何历史数据与模型都无法预测未来。</li>
+            <li>请理性购彩，量力而行，未满 18 周岁禁止购买彩票。</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>© {{ datetime.utcnow().year }} 双色球智能推荐助手</span>
+        <span>仅供学习与研究使用</span>
+      </footer>
+    </div>
+
+    <script>
+      function renderBalls(balls, type) {
+        return balls
+          .map(
+            (n) =>
+              `<span class="ball ball-${type}">${String(n)
+                .padStart(2, "0")}</span>`
+          )
+          .join("");
+      }
+
+      function renderPlan(plan) {
+        if (!plan) {
+          document.getElementById("result-container").innerHTML =
+            '<div class="empty">暂无推荐结果，请点击“生成推荐方案”。</div>';
+          return;
+        }
+
+        const singles = plan.singles_6_1 || [];
+        const combo7 = plan.combo_7_1 || null;
+        const combo62 = plan.combo_6_2 || null;
+
+        let html = "";
+
+        // 8 注 6+1 单式
+        html += '<div class="result-block">';
+        html += '<div class="result-block-title">8 注 6+1 单式（智能策略）</div>';
+        html += '<div class="ticket-list">';
+        singles.forEach((t, idx) => {
+          html += `
+            <div class="ticket-card">
+              <div class="ticket-header">
+                <span class="ticket-tag">单式 ${idx + 1}</span>
+                <span class="ticket-strategy">${t.strategy}</span>
+              </div>
+              <div class="ticket-body">
+                <div class="ticket-red">
+                  <span class="label">红球</span>
+                  <span class="balls">${renderBalls(
+                    t.red_balls,
+                    "red"
+                  )}</span>
+                </div>
+                <div class="ticket-blue">
+                  <span class="label">蓝球</span>
+                  <span class="balls">${renderBalls(
+                    t.blue_balls,
+                    "blue"
+                  )}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += "</div></div>";
+
+        // 7+1 复式
+        if (combo7) {
+          html += '<div class="result-block">';
+          html +=
+            '<div class="result-block-title">7+1 复式（基于历史高匹配策略）</div>';
+          html += `
+            <div class="ticket-card ticket-card-strong">
+              <div class="ticket-header">
+                <span class="ticket-tag">7+1</span>
+                <span class="ticket-strategy">${combo7.source_strategy}</span>
+              </div>
+              <div class="ticket-body">
+                <div class="ticket-red">
+                  <span class="label">红球</span>
+                  <span class="balls">${renderBalls(
+                    combo7.red_balls,
+                    "red"
+                  )}</span>
+                </div>
+                <div class="ticket-blue">
+                  <span class="label">蓝球</span>
+                  <span class="balls">${renderBalls(
+                    combo7.blue_balls,
+                    "blue"
+                  )}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          html += "</div>";
+        }
+
+        // 6+2 复式
+        if (combo62) {
+          html += '<div class="result-block">';
+          html +=
+            '<div class="result-block-title">6+2 复式（基于历史高匹配策略）</div>';
+          html += `
+            <div class="ticket-card ticket-card-strong">
+              <div class="ticket-header">
+                <span class="ticket-tag">6+2</span>
+                <span class="ticket-strategy">${combo62.source_strategy}</span>
+              </div>
+              <div class="ticket-body">
+                <div class="ticket-red">
+                  <span class="label">红球</span>
+                  <span class="balls">${renderBalls(
+                    combo62.red_balls,
+                    "red"
+                  )}</span>
+                </div>
+                <div class="ticket-blue">
+                  <span class="label">蓝球</span>
+                  <span class="balls">${renderBalls(
+                    combo62.blue_balls,
+                    "blue"
+                  )}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          html += "</div>";
+        }
+
+        document.getElementById("result-container").innerHTML = html;
+      }
+
+      // 页面初始化：渲染后端预先生成的方案
+      if (window.__INITIAL_PLAN__) {
+        renderPlan(window.__INITIAL_PLAN__);
+      } else {
+        renderPlan(null);
+      }
+
+      // 绑定表单提交事件
+      const form = document.getElementById("form-recommend");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const red_dan = document.getElementById("red_dan").value.trim();
+        const blue_dan = document.getElementById("blue_dan").value.trim();
+
+        const strategyCheckboxes = document.querySelectorAll(
+          'input[name="strategy"]:checked'
+        );
+        const strategies = Array.from(strategyCheckboxes).map(
+          (el) => el.value
+        );
+
+        const btn = form.querySelector(".btn-primary");
+        const oldText = btn.textContent;
+        btn.textContent = "生成中...";
+        btn.disabled = true;
+
+        try {
+          const res = await fetch("/api/recommend", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ red_dan, blue_dan, strategies }),
+          });
+          const data = await res.json();
+          renderPlan(data.plan);
+        } catch (err) {
+          console.error(err);
+          alert("生成方案失败，请稍后重试。");
+        } finally {
+          btn.textContent = oldText;
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById("btn-clear").addEventListener("click", () => {
+        document.getElementById("red_dan").value = "";
+        document.getElementById("blue_dan").value = "";
+      });
+    </script>
+  </body>
+</html>
+

@@ -45,7 +45,7 @@
 ## 📁 项目结构
 
 ```
-lucky_ball/
+ssq/
 ├── lottery_analyzer.py          # 主分析脚本
 ├── requirements.txt             # Python依赖包
 ├── lottery_data.json           # 开奖数据文件 (自动生成)
@@ -64,10 +64,10 @@ lucky_ball/
 
 1. **克隆仓库**
 
-   ```bash
-   git clone https://github.com/your-username/lucky_ball.git
-   cd lucky_ball
-   ```
+```bash
+git clone https://github.com/your-username/ssq.git
+cd ssq
+```
 2. **安装依赖**
 
    ```bash
