@@ -13,42 +13,38 @@
     <div class="page">
       <header class="header">
         <div class="header-title">邪修双色球</div>
-        <div class="header-subtitle">
-          （仅供学习与参考）
-        </div>
         <div class="header-meta">
           <span>最新期号：<strong>{{ latest_period }}</strong></span>
           <span>开奖日期：<strong>{{ latest_date }}</strong></span>
         </div>
       </header>
-
       <main class="main">
         <section class="card">
           <h2 class="card-title">参数设置</h2>
-
           <form id="form-recommend" class="form">
-            <div class="form-row">
-              <label for="red_dan" class="form-label">红胆（1-33，逗号分隔）</label>
-              <input
-                id="red_dan"
-                name="red_dan"
-                type="text"
-                inputmode="numeric"
-                placeholder="例如：3, 9, 16（可留空）"
-                class="form-input"
-              />
-            </div>
-
-            <div class="form-row">
-              <label for="blue_dan" class="form-label">蓝胆（1-16）</label>
-              <input
-                id="blue_dan"
-                name="blue_dan"
-                type="text"
-                inputmode="numeric"
-                placeholder="例如：8（可留空）"
-                class="form-input"
-              />
+            <div class="form-row form-row-inline">
+              <div class="form-field">
+                <label for="red_dan" class="form-label">红胆（1-33）</label>
+                <input
+                  id="red_dan"
+                  name="red_dan"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="可留空"
+                  class="form-input"
+                />
+              </div>
+              <div class="form-field">
+                <label for="blue_dan" class="form-label">蓝胆（1-16）</label>
+                <input
+                  id="blue_dan"
+                  name="blue_dan"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder="可留空"
+                  class="form-input"
+                />
+              </div>
             </div>
 
             <div class="form-row">
@@ -230,25 +226,11 @@
         html += '<div class="ticket-list">';
         singles.forEach((t, idx) => {
           html += `
-            <div class="ticket-card">
-              <div class="ticket-header">
-                <span class="ticket-tag">单式 ${idx + 1}</span>
-                <span class="ticket-strategy">${t.strategy}</span>
-              </div>
-              <div class="ticket-body">
-                <div class="ticket-red">
-                  <span class="balls">${renderBalls(
-                    t.red_balls,
-                    "red"
-                  )}</span>
-                </div>
-                <div class="ticket-blue">
-                  <span class="balls">${renderBalls(
-                    t.blue_balls,
-                    "blue"
-                  )}</span>
-                </div>
-              </div>
+            <div class="ticket-card ticket-card-row">
+              <span class="ticket-tag">单式 ${idx + 1}</span>
+              <span class="ticket-balls ticket-red">${renderBalls(t.red_balls, "red")}</span>
+              <span class="ticket-balls ticket-blue">${renderBalls(t.blue_balls, "blue")}</span>
+              <span class="ticket-strategy">${t.strategy}</span>
             </div>
           `;
         });
@@ -260,25 +242,11 @@
           html +=
             '<div class="result-block-title">7+1 复式（基于历史高匹配策略）</div>';
           html += `
-            <div class="ticket-card ticket-card-strong">
-              <div class="ticket-header">
-                <span class="ticket-tag">7+1</span>
-                <span class="ticket-strategy">${combo7.source_strategy}</span>
-              </div>
-              <div class="ticket-body">
-                <div class="ticket-red">
-                  <span class="balls">${renderBalls(
-                    combo7.red_balls,
-                    "red"
-                  )}</span>
-                </div>
-                <div class="ticket-blue">
-                  <span class="balls">${renderBalls(
-                    combo7.blue_balls,
-                    "blue"
-                  )}</span>
-                </div>
-              </div>
+            <div class="ticket-card ticket-card-strong ticket-card-row">
+              <span class="ticket-tag">7+1</span>
+              <span class="ticket-balls ticket-red">${renderBalls(combo7.red_balls, "red")}</span>
+              <span class="ticket-balls ticket-blue">${renderBalls(combo7.blue_balls, "blue")}</span>
+              <span class="ticket-strategy">${combo7.source_strategy}</span>
             </div>
           `;
           html += "</div>";
@@ -290,25 +258,11 @@
           html +=
             '<div class="result-block-title">6+2 复式（基于历史高匹配策略）</div>';
           html += `
-            <div class="ticket-card ticket-card-strong">
-              <div class="ticket-header">
-                <span class="ticket-tag">6+2</span>
-                <span class="ticket-strategy">${combo62.source_strategy}</span>
-              </div>
-              <div class="ticket-body">
-                <div class="ticket-red">
-                  <span class="balls">${renderBalls(
-                    combo62.red_balls,
-                    "red"
-                  )}</span>
-                </div>
-                <div class="ticket-blue">
-                  <span class="balls">${renderBalls(
-                    combo62.blue_balls,
-                    "blue"
-                  )}</span>
-                </div>
-              </div>
+            <div class="ticket-card ticket-card-strong ticket-card-row">
+              <span class="ticket-tag">6+2</span>
+              <span class="ticket-balls ticket-red">${renderBalls(combo62.red_balls, "red")}</span>
+              <span class="ticket-balls ticket-blue">${renderBalls(combo62.blue_balls, "blue")}</span>
+              <span class="ticket-strategy">${combo62.source_strategy}</span>
             </div>
           `;
           html += "</div>";
