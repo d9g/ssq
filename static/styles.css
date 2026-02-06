@@ -121,11 +121,16 @@ body {
 }
 
 .form-row-inline .form-field {
-  flex: 1;
-  min-width: 120px;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.form-row-inline .form-field .form-input {
+  width: 5em;
+  min-width: 5em;
+  box-sizing: border-box;
 }
 
 .form-label {
@@ -290,7 +295,8 @@ body {
 .ticket-card-row .ticket-strategy {
   color: #9ca3af;
   font-size: 0.8rem;
-  margin-left: auto;
+  width: 5em;
+  flex-shrink: 0;
 }
 
 .ticket-tag {
@@ -428,10 +434,6 @@ body {
 
   .card {
     padding: 12px 12px 14px;
-  }
-
-  .form-row-inline .form-field {
-    min-width: 100%;
   }
 
   .ticket-card-row {
