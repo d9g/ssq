@@ -297,6 +297,9 @@ body {
   font-size: 0.8rem;
   width: 5em;
   flex-shrink: 0;
+  margin-left: auto;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .ticket-tag {
@@ -436,13 +439,18 @@ body {
     padding: 12px 12px 14px;
   }
 
-  .ticket-card-row {
-    gap: 6px 8px;
+  .form-row-inline .form-field {
+    flex: 1 1 50%;
+    min-width: 0;
   }
 
-  .ticket-card-row .ticket-strategy {
-    margin-left: 0;
+  .form-row-inline .form-field .form-input {
     width: 100%;
+    min-width: 0;
+  }
+
+  .ticket-card-row {
+    gap: 6px 8px;
   }
 
   .footer {
