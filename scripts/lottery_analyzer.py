@@ -1260,7 +1260,8 @@ class DoubleColorBallAnalyzer:
         - 1 注 7+1 复式
         - 1 注 6+2 复式
         
-        其中 7+1、6+2 复式基于“历史上出现情况最多”的策略特征构建。
+        复式采用价值回归思路：7+1、6+2 基于“历史最低匹配”策略构建，
+        扩展球选用历史低频号码，期待冷门特征回归。
         """
         if not silent:
             print("\n=== 生成增强版推荐方案：8种策略 + 2种复式 ===")
@@ -1283,7 +1284,8 @@ class DoubleColorBallAnalyzer:
                 print("8种策略推荐生成失败，无法构建增强方案。")
             return {}
 
-        # 分析每种策略在历史中的“支持度”：使用出现次数最多的奇偶/和值/跨度模式
+        # 分析每种策略在历史中的“支持度”：奇偶/和值/跨度在历史中的出现次数
+        # 价值回归：复式选用历史最低匹配策略（得分最低），期待冷门特征回归
         best_rec = None
         best_score = None
         for rec in recommendations:
@@ -1296,22 +1298,22 @@ class DoubleColorBallAnalyzer:
                 span_dist.get(sp, 0)
             )
             rec['history_score'] = score
-            if best_score is None or score > best_score:
+            if best_score is None or score < best_score:
                 best_score = score
                 best_rec = rec
 
         if not silent:
-            print("\n历史匹配度评分（越高表示该策略特征在历史中越常见）：")
+            print("\n历史匹配度评分（越低表示该策略特征在历史中越少见，复式采用最低分策略）：")
             for idx, rec in enumerate(recommendations, 1):
                 print(f"策略 {idx} [{rec['strategy']}]: 历史匹配得分 = {rec.get('history_score', 0)}")
 
         if not best_rec:
             if not silent:
-                print("未能根据历史数据识别出最优策略特征，跳过复式构建。")
+                print("未能根据历史数据识别出策略特征，跳过复式构建。")
             best_rec = recommendations[0]
 
         if not silent:
-            print(f"\n📌 历史模式最匹配的策略: {best_rec['strategy']} (得分 {best_rec.get('history_score', 0)})")
+            print(f"\n📌 复式采用历史最低匹配策略（价值回归）: {best_rec['strategy']} (得分 {best_rec.get('history_score', 0)})")
 
         # ---------- 8 注 6+1 单式（直接使用8种策略结果） ----------
         singles_6_1 = []
@@ -1336,7 +1338,7 @@ class DoubleColorBallAnalyzer:
                 red_counter[r] += 1
             blue_counter[record['blue_ball']] += 1
 
-        # 以历史最匹配策略的红球为基础
+        # 以历史最低匹配策略（价值回归）的红球为基础
         base_reds = sorted(best_rec["red_balls"])
         base_blue = best_rec["blue_ball"]
 
@@ -1367,10 +1369,10 @@ class DoubleColorBallAnalyzer:
                     break
 
         # ---------- 7+1 复式：在基础6个红球上扩展1个红球 ----------
-        # 选择历史高频、且不在基础组合中的一个红球作为扩展
+        # 价值回归：选择历史低频、且不在基础组合中的一个红球作为扩展
         extra_red = None
         if red_counter:
-            sorted_reds_by_freq = [n for n, _ in sorted(red_counter.items(), key=lambda x: x[1], reverse=True)]
+            sorted_reds_by_freq = [n for n, _ in sorted(red_counter.items(), key=lambda x: x[1])]
             for n in sorted_reds_by_freq:
                 if n not in base_reds:
                     extra_red = n
@@ -1391,14 +1393,14 @@ class DoubleColorBallAnalyzer:
             "blue_balls": [base_blue],
             "type": "7+1",
             "source_strategy": best_rec["strategy"],
-            "description": "基于历史高匹配策略扩展1个高频红球构建7+1复式"
+            "description": "基于历史最低匹配策略（价值回归）扩展1个低频红球构建7+1复式"
         }
 
         # ---------- 6+2 复式：基础红球 + 1个额外蓝球 ----------
-        # 选择一个与基础蓝球不同的高频蓝球
+        # 价值回归：选择一个与基础蓝球不同的低频蓝球
         extra_blue = None
         if blue_counter:
-            sorted_blues_by_freq = [b for b, _ in sorted(blue_counter.items(), key=lambda x: x[1], reverse=True)]
+            sorted_blues_by_freq = [b for b, _ in sorted(blue_counter.items(), key=lambda x: x[1])]
             for b in sorted_blues_by_freq:
                 if b != base_blue:
                     extra_blue = b
@@ -1417,7 +1419,7 @@ class DoubleColorBallAnalyzer:
             "blue_balls": sorted([base_blue, extra_blue]),
             "type": "6+2",
             "source_strategy": best_rec["strategy"],
-            "description": "基于历史高匹配策略蓝球扩展构建6+2复式"
+            "description": "基于历史最低匹配策略（价值回归）蓝球扩展构建6+2复式"
         }
 
         enhanced_plan = {
@@ -1434,12 +1436,12 @@ class DoubleColorBallAnalyzer:
                 blue_str = " ".join(f"{x:02d}" for x in t["blue_balls"])
                 print(f"单式 {i}: {red_str} + {blue_str}  (策略: {t['strategy']})")
 
-            print("\n--- 1 注 7+1 复式（基于历史高匹配策略） ---")
+            print("\n--- 1 注 7+1 复式（基于历史最低匹配策略/价值回归） ---")
             red_str = " ".join(f"{x:02d}" for x in ticket_7_1["red_balls"])
             blue_str = " ".join(f"{x:02d}" for x in ticket_7_1["blue_balls"])
             print(f"7+1: {red_str} + {blue_str}  (来源策略: {ticket_7_1['source_strategy']})")
 
-            print("\n--- 1 注 6+2 复式（基于历史高匹配策略） ---")
+            print("\n--- 1 注 6+2 复式（基于历史最低匹配策略/价值回归） ---")
             red_str = " ".join(f"{x:02d}" for x in ticket_6_2["red_balls"])
             blue_str = " ".join(f"{x:02d}" for x in ticket_6_2["blue_balls"])
             print(f"6+2: {red_str} + {blue_str}  (来源策略: {ticket_6_2['source_strategy']})")
